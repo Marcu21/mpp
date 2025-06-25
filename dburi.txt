@@ -1,0 +1,254 @@
+INDICII 2023:
+
+-- =================== Player  (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Player (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    alias   TEXT NOT NULL UNIQUE
+);
+
+-- =================== Hint (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Hint (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    row     INTEGER NOT NULL CHECK(row BETWEEN 1 AND 4),
+    col     INTEGER NOT NULL CHECK(col BETWEEN 1 AND 4),
+    text    TEXT    NOT NULL,
+    UNIQUE(row, col)
+);
+
+-- =================== Game (gestionat cu Hibernate) ===================
+CREATE TABLE IF NOT EXISTS Game (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    player_id   INTEGER NOT NULL,
+    targetRow   INTEGER NOT NULL CHECK(targetRow BETWEEN 1 AND 4),
+    targetCol   INTEGER NOT NULL CHECK(targetCol BETWEEN 1 AND 4),
+    attempts    INTEGER NOT NULL DEFAULT 0,
+    completed   INTEGER NOT NULL DEFAULT 0, -- 0=în desfășurare, 1=terminat
+    startTime   DATETIME NOT NULL,
+    endTime     DATETIME,
+    FOREIGN KEY (player_id) REFERENCES Player(id)
+);
+
+-- =================== GameAttempt (opțional, JDBC sau ignorat) ===================
+CREATE TABLE IF NOT EXISTS GameAttempt (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id   INTEGER NOT NULL,
+    row       INTEGER NOT NULL CHECK(row BETWEEN 1 AND 4),
+    col       INTEGER NOT NULL CHECK(col BETWEEN 1 AND 4),
+    hintText  TEXT    NOT NULL,
+    guessed   INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (game_id) REFERENCES Game(id)
+);
+
+
+
+
+GROPI 2023:
+
+-- =================== Player (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Player (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    alias   TEXT NOT NULL UNIQUE
+);
+
+-- =================== Game (gestionat cu Hibernate) ===================
+CREATE TABLE IF NOT EXISTS Game (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    player_id   INTEGER NOT NULL,
+    startTime   DATETIME NOT NULL,
+    endTime     DATETIME,
+    score       INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (player_id) REFERENCES Player(id)
+);
+
+-- =================== Hole (gestionat cu Hibernate) ===================
+CREATE TABLE IF NOT EXISTS Hole (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id   INTEGER NOT NULL,
+    row       INTEGER NOT NULL CHECK (row BETWEEN 1 AND 4),
+    col       INTEGER NOT NULL CHECK (col BETWEEN 1 AND 4),
+    FOREIGN KEY (game_id) REFERENCES Game(id),
+    UNIQUE(game_id, row, col) -- să nu fie 2 gropi în același loc
+);
+
+-- =================== GameAttempt (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS GameAttempt (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id   INTEGER NOT NULL,
+    attempt_time DATETIME NOT NULL,
+    row       INTEGER NOT NULL CHECK (row BETWEEN 1 AND 4),
+    col       INTEGER NOT NULL CHECK (col BETWEEN 1 AND 4),
+    FOREIGN KEY (game_id) REFERENCES Game(id)
+);
+
+
+
+Xsi0 2023:
+
+CREATE TABLE Player ( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    alias TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE Game ( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    player_id INTEGER NOT NULL,
+    start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    end_time DATETIME,
+    score INTEGER NOT NULL,
+    result TEXT, 
+    FOREIGN KEY (player_id) REFERENCES players(id)
+); 
+
+CREATE TABLE GameAttempt ( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id INTEGER NOT NULL,
+    row INTEGER, 
+    col INTEGER, 
+    FOREIGN KEY (game_id) REFERENCES games(id)
+);
+
+
+
+MEMORY GAME 2023:
+
+-- =================== Player (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Player (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    alias   TEXT NOT NULL UNIQUE
+);
+
+-- =================== Word (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Word (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    text  TEXT NOT NULL UNIQUE
+);
+
+-- =================== Configuration (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS Configuration (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    word_list  TEXT NOT NULL -- ex: 'a,b,a,c,b,d,d,c,e,e'
+);
+
+-- =================== Game (gestionat cu Hibernate) ===================
+CREATE TABLE IF NOT EXISTS Game (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    player_id        INTEGER NOT NULL,
+    configuration_id INTEGER NOT NULL,
+    start_time       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_time         DATETIME, -- devine NOT NULL când jocul e finalizat
+    score            INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (player_id)        REFERENCES Player(id),
+    FOREIGN KEY (configuration_id) REFERENCES Configuration(id)
+);
+
+-- =================== GameAttempt (gestionat manual cu JDBC) ===================
+CREATE TABLE IF NOT EXISTS GameAttempt (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id INTEGER NOT NULL,
+    pos1    INTEGER NOT NULL CHECK (pos1 BETWEEN 0 AND 9),
+    pos2    INTEGER NOT NULL CHECK (pos2 BETWEEN 0 AND 9),
+    correct INTEGER NOT NULL DEFAULT 0, -- 1 = pereche corectă
+    FOREIGN KEY (game_id) REFERENCES Game(id)
+);
+
+
+
+CAPCANE 2024:
+
+CREATE TABLE IF NOT EXISTS Player (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	alias TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS Game (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	player_id INTEGER NOT NULL,
+	start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	end_time DATETIME,
+	score INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY (player_id) REFERENCES Player(id)
+);
+
+CREATE TABLE IF NOT EXISTS Trap (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id INTEGER NOT NULL,
+	row INTEGER NOT NULL,
+	col INTEGER NOT NULL,
+	FOREIGN KEY (game_id) REFERENCES Game(id),
+    UNIQUE(game_id, row, col)
+);
+
+CREATE TABLE IF NOT EXISTS GameAttempt (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id INTEGER NOT NULL,
+	row INTEGER NOT NULL,
+	col INTEGER NOT NULL,
+	FOREIGN KEY (game_id) REFERENCES Game(id)
+);
+
+
+
+CUVINTE 2024:
+
+CREATE TABLE IF NOT EXISTS Player (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	alias TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS Game (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	player_id INTEGER NOT NULL,
+	configuration_id INTEGER NOT NULL,
+	start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	end_time DATETIME,
+	score INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY (player_id) REFERENCES Player(id),
+	FOREIGN KEY (configuration_id) REFERENCES Configuration(id)
+);
+
+CREATE TABLE Configuration (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	letters TEXT NOT NULL,
+	words TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS GameAttempt (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id INTEGER NOT NULL,
+	word TEXT NOT NULL,
+	guessed   INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY (game_id) REFERENCES Game(id)
+);
+
+
+
+BANI MODEL:
+CREATE TABLE IF NOT EXISTS Player (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	alias TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS Game (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	player_id INTEGER NOT NULL,
+	configuration_id INTEGER NOT NULL,
+	start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	end_time DATETIME,
+	suma_finala INTEGER NOT NULL DEFAULT 50,
+	FOREIGN KEY (player_id) REFERENCES Player(id),
+	FOREIGN KEY (configuration_id) REFERENCES Configuration(id)
+);
+
+CREATE TABLE Configuration (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	valori TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS GameAttempt (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id INTEGER NOT NULL,
+	dice_roll INTEGER NOT NULL,
+	position INTEGER NOT NULL,
+	modificare_suma INTEGER NOT NULL,
+	FOREIGN KEY (game_id) REFERENCES Game(id)
+);
