@@ -1,0 +1,206 @@
+1. Explicati termenul ORM impedance missmatch
+
+ORM impedance mismatch se referă la diferențele dintre modelul orientat pe obiecte (folosit în limbaje de programare) 
+și modelul relațional (folosit în baze de date).
+Aceste două modele gestionează datele diferit:
+– în OOP avem clase, obiecte, moștenire și relații prin referințe;
+– în modelul relațional avem tabele, rânduri și relații prin chei externe.
+
+Pentru că cele două modele funcționează diferit, apar probleme atunci când vrem să legăm obiectele din cod cu datele 
+din tabel. De exemplu, moștenirea din OOP nu are un corespondent direct în SQL.
+
+Această „nepotrivire” face ca legătura dintre cele două modele să fie dificilă. Framework-urile ORM încearcă să reducă
+ acest decalaj, dar uneori pot apărea limitări sau soluții complicate.
+ 
+
+2. Explicati modelul Point to point din comunicarea asincrona
+
+Modelul Point-to-Point este un tip de comunicare asincronă în care un mesaj este trimis de un singur expeditor și este
+ preluat de un singur destinatar.
+
+Comunicarea se face printr-o coadă de mesaje (queue). Expeditorul pune mesajul în coadă, iar destinatarul îl preia 
+când este disponibil. După ce mesajul este consumat, acesta dispare din coadă și nu mai poate fi accesat de altcineva.
+
+Acest model se folosește când dorim ca fiecare mesaj să fie procesat o singură dată, de un singur consumator. 
+Avantajul principal al acestui model este că expeditorul și destinatarul nu trebuie să fie activi în același timp. 
+Este potrivit pentru scenarii unu-la-unu, cum ar fi trimiterea de comenzi către un procesator, unde fiecare comandă 
+trebuie tratată o singură dată și de un singur serviciu.
+
+
+3. Descrieti modelul publish subscribe din comunicarea asincrona
+
+Modelul Publish-Subscribe este un tip de comunicare asincronă în care un expeditor (publisher) trimite mesaje fără să
+ cunoască direct destinatarii. Mesajele sunt livrate către toți subscriberii care sunt interesați de un anumit tip de mesaj.
+
+Comunicarea se face prin intermediul unui sistem de mesagerie (broker), care se ocupă cu distribuirea mesajelor. 
+Publisher-ul publică un mesaj într-un „canal” sau „topic”, iar toți subscriberii abonați la acel topic îl vor primi.
+
+Spre deosebire de modelul Point-to-Point, în Publish-Subscribe un mesaj poate fi livrat la mai mulți destinatari în 
+același timp.
+
+Acest model este folosit atunci când dorim comunicare unu-la-mai-mulți, cum ar fi în notificări.
+
+
+
+4. Ce este un broker de mesaje
+
+Un broker de mesaje este o componentă intermediară care gestionează trimiterea și livrarea mesajelor între expeditori 
+(producători) și destinatari (consumatori).
+
+În comunicarea asincronă, brokerul primește mesajele de la expeditor și le redirecționează automat către unul sau mai 
+mulți destinatari, în funcție de modelul folosit (ex: Point-to-Point sau Publish-Subscribe).
+
+Brokerul ajută la decuplarea aplicațiilor – adică expeditorul și destinatarul nu trebuie să știe unul de altul și 
+nici să fie activi în același timp. Exemple de brokeri de mesaje: RabbitMQ, Apache Kafka, ActiveMQ.
+
+
+
+5. Explicati constrangerea stateless a arhitecturii REST
+
+Constrângerea stateless în arhitectura REST înseamnă că fiecare cerere trimisă de client către server trebuie să 
+conțină toate informațiile necesare pentru a fi înțeleasă și procesată.
+
+Serverul nu păstrează nicio informație despre starea anterioară a clientului între cereri. Cu alte cuvinte, fiecare 
+cerere este independentă și nu depinde de o cerere anterioară.
+
+Această constrângere face aplicațiile REST mai scalabile și mai ușor de întreținut, deoarece serverul nu trebuie să 
+memoreze starea fiecărui client.
+
+Un exemplu este transmiterea unui token de autentificare (ex: JWT) în fiecare cerere, deoarece serverul nu „știe” 
+cine ești dacă nu îi trimiți din nou acel token.
+
+
+6. Descrieti o tehnica ORM pentru maparea mostenirii
+
+O tehnică folosită de ORM pentru maparea moștenirii este „Table per class hierarchy” (o singură tabelă pentru întreaga ierarhie de clase).
+
+În această abordare, toate clasele dintr-o ierarhie de moștenire sunt mapate într-o singură tabelă, care conține 
+coloane pentru toate câmpurile din clasele părinte și derivate. Pentru a diferenția tipurile de obiecte, se folosește 
+o coloană specială numită discriminator (ex: „tip” sau „clasa”).
+
+Avantaje:
+performanță bună la interogare (un singur SELECT)
+structură simplă în bază de date
+
+Dezavantaj:
+tabela poate conține multe coloane nefolosite (câmpuri nule), mai ales când clasele derivate au multe atribute proprii
+
+Această tehnică este des folosită în Hibernate și alte ORM-uri prin adnotări sau setări de configurare.
+
+
+7. Descrieti structura unui token JWT
+
+Un token JWT (JSON Web Token) este un format standard pentru transmiterea securizată a informațiilor între două părți.
+ Are o structură formată din trei părți, separate prin puncte:
+
+Header – conține informații despre tipul tokenului (JWT) și algoritmul de semnare folosit (ex: HS256).
+Payload – conține datele care descriu utilizatorul sau contextul (ex: ID-ul utilizatorului, rol, data expirării).
+
+Signature – este o semnătură digitală calculată pe baza header-ului și payload-ului, cu un secret cunoscut doar de 
+server. Asigură integritatea tokenului.
+
+Un exemplu de token arată astfel:
+xxxxx.yyyyy.zzzzz
+Tokenul este codificat în Base64 și poate fi verificat de server fără a fi nevoie să stocheze starea (stateless).
+
+
+
+8. Explicati cum functioneaza sablonul Proxy distribuit
+
+Șablonul Proxy distribuit este un tip de proxy care oferă acces local la un obiect aflat la distanță, într-un alt 
+spațiu de memorie sau pe un alt server.
+
+Clientul interacționează cu proxy-ul ca și cum ar interacționa direct cu obiectul real, dar în realitate, proxy-ul 
+trimite cererea prin rețea către obiectul de la distanță (numit obiect real sau „remote object”).
+
+Scopul este de a ascunde detaliile rețelei și de a face ca apelurile la un obiect remote să pară locale pentru client.
+Proxy-ul se ocupă de comunicare, serializare/deserializare și gestionarea eventualelor erori de rețea.
+
+Este folosit, de exemplu, în sistemele distribuite, cum ar fi RMI (Remote Method Invocation) în Java sau gRPC, unde 
+un client apelează metode care sunt de fapt executate pe un alt server.
+
+
+
+9. Explicati conceptul de dependecy injection
+
+Dependency Injection (DI) este un principiu prin care un obiect nu își creează singur dependențele 
+(alte obiecte de care are nevoie), ci le primește din exterior, de obicei prin constructor sau printr-o metodă.
+
+Scopul este de a separa responsabilitățile și de a face codul mai ușor de modificat și testat.
+
+Avantajele principale ale DI sunt:
+Decuplare: clasele nu mai depind direct unele de altele; pot fi schimbate sau înlocuite mai ușor.
+Testare ușoară: poți injecta mock-uri sau instanțe de test, fără să modifici codul original.
+Flexibilitate și extensibilitate: poți schimba implementările dependențelor fără să modifici clasa principală.
+Reutilizare: obiectele pot fi folosite în mai multe locuri, fără să fie legate de o implementare fixă.
+
+Un exemplu clasic este în framework-uri ca Spring (Java), unde dependențele sunt injectate automat de containerul de rulare.
+
+
+
+10. Explicati ce intelegeti prin inversion of control (IoC)
+
+Inversion of Control este un principiu prin care controlul asupra creării obiectelor și a legăturilor dintre ele nu mai
+ este realizat direct în codul aplicației, ci este „inversat” – adică preluat de un framework sau de un container extern.
+
+În loc ca o clasă să își creeze singură dependențele, acestea îi sunt oferite din afară. Astfel, aplicația devine mai 
+flexibilă, mai ușor de testat și mai bine organizată.
+
+Un exemplu concret de aplicare a IoC este Dependency Injection, unde obiectele sunt furnizate automat, fără ca ele să 
+știe de unde vin.
+
+
+
+11. Descrieți o tehnică ORM pentru maparea membrilor statici
+
+Membrii statici nu pot fi mapați direct, pentru că nu aparțin unei instanțe, ci clasei. De aceea, se creează o clasă 
+obișnuită (ex: Config) mapată la o tabelă cu un singur rând, care conține valorile statice.
+
+La pornirea aplicației, aceste valori sunt citite din baza de date și setate manual în câmpurile statice.
+
+Avantaje:
+– valorile statice pot fi stocate și modificate din baza de date
+– utile pentru configurări globale
+
+Dezavantaj:
+– trebuie scris cod suplimentar pentru citirea și setarea valorilor
+
+Această tehnică este folosită când avem constante sau setări globale care trebuie să vină din baza de date.
+
+
+12. Explicati cum functioneaza protocolul websocket
+
+Protocolul WebSocket permite o comunicare continuă și bidirecțională între client și server, printr-o singură 
+conexiune care rămâne deschisă.
+
+La început, conexiunea este una HTTP obișnuită. Clientul trimite o cerere specială (upgrade request), iar serverul 
+răspunde că acceptă schimbarea. După acest „handshake”, conexiunea se transformă din HTTP în WebSocket.
+
+Diferența față de HTTP este că, după transformare:
+
+conexiunea nu se mai închide după fiecare cerere-răspuns,
+
+clientul și serverul pot trimite mesaje oricând, fără a aștepta unul după altul,
+
+comunicarea devine în timp real și cu latență mică.
+
+WebSocket este potrivit pentru aplicații care au nevoie de actualizări rapide, cum ar fi chat-uri sau jocuri online.
+
+
+
+13. Explicati sablonul Data Transfer Object
+
+Un DTO este un obiect simplu folosit pentru a transporta date între straturi ale aplicației 
+(ex: între server și client), fără logică de business.
+
+Un DTO conține doar atribute și metode de acces (getteri/setteri) și este folosit pentru a transmite doar datele 
+necesare, fără să expună direct entitățile din baza de date.
+
+Daca entitatea User are și parolă, un UserDTO poate conține doar username și email, astfel protejând datele sensibile.
+
+Avantaje:
+– ascunde datele interne sensibile (ex: parola);
+– reduce traficul de date;
+– separă modelul intern de cel extern (ex: în API REST).
+
+Este des folosit în aplicații pe mai multe straturi sau în comunicația client–server.
